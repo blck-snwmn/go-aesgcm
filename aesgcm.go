@@ -1,4 +1,4 @@
-package main
+package goaesgcm
 
 import (
 	"crypto/aes"
@@ -38,11 +38,11 @@ func xors(l, r []byte) []byte {
 	return ll
 }
 
-func enc(plaintext, key, nonce []byte) ([]byte, error) {
-	return encWitchCounter(plaintext, key, nonce, genCounter(nonce))
+func Enc(plaintext, key, nonce []byte) ([]byte, error) {
+	return EncWitchCounter(plaintext, key, nonce, genCounter(nonce))
 }
 
-func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) ([]byte, error) {
+func EncWitchCounter(plaintext, key, nonce []byte, c [16]byte) ([]byte, error) {
 	blockNum, r := len(plaintext)/size, len(plaintext)%size
 	if r != 0 {
 		blockNum++
@@ -145,9 +145,9 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 	return hashed
 }
 
-func seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
+func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
 	counter := incrementCounter(genCounter(nonce))
-	ct, err := encWitchCounter(plaintext, key, nonce, counter)
+	ct, err := EncWitchCounter(plaintext, key, nonce, counter)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func main() {
 	{
 		c := genCounter(nonce)
 		c = incrementCounter(c)
-		b, err := encWitchCounter(plaintext, key, nonce, c)
+		b, err := EncWitchCounter(plaintext, key, nonce, c)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -195,7 +195,7 @@ func main() {
 	additionalData := []byte{}
 	{
 		fmt.Printf("====start standard encryption====\n")
-		b, err := seal(plaintext, key, nonce, additionalData)
+		b, err := Seal(plaintext, key, nonce, additionalData)
 		if err != nil {
 			fmt.Println(err)
 			return
