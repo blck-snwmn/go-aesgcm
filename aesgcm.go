@@ -2,12 +2,7 @@ package goaesgcm
 
 import (
 	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
 	"encoding/binary"
-	"encoding/hex"
-	"fmt"
-	"io"
 )
 
 const size = 16
@@ -166,56 +161,4 @@ func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
 
 	ct = append(ct, tags[:]...)
 	return ct, nil
-}
-
-func main() {
-	key, _ := hex.DecodeString("000102030405060708090A0B0C0E0F101112131415161718191A1B1C1E1F2021")
-	plaintext := []byte("text")
-
-	nonce := make([]byte, 12)
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		fmt.Println(err)
-		return
-	}
-	// var nonce = []byte{
-	// 	0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-	// 	0x21, 0x22, 0x23, 0x24, 0x25, 0x26,
-	// }
-	{
-		c := genCounter(nonce)
-		c = incrementCounter(c)
-		b, err := EncWitchCounter(plaintext, key, nonce, c)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Printf("%x\n", b)
-	}
-
-	additionalData := []byte{}
-	{
-		fmt.Printf("====start standard encryption====\n")
-		b, err := Seal(plaintext, key, nonce, additionalData)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Printf("result\t%x\n", b)
-	}
-	{
-		ss, _ := aes.NewCipher(key)
-		aa, _ := cipher.NewGCM(ss)
-		fmt.Printf("====start go encryption====\n")
-		b := aa.Seal(nil, nonce, plaintext, additionalData)
-		fmt.Printf("result\t%x\n", b)
-
-		c := genCounter(nonce)
-		c = incrementCounter(c)
-		s := cipher.NewCTR(ss, c[:])
-
-		dst := make([]byte, len(plaintext))
-		s.XORKeyStream(dst, plaintext)
-		fmt.Printf("test\t%x\n", dst)
-	}
-
 }
