@@ -144,7 +144,7 @@ func Test_enc(t *testing.T) {
 	}
 	plaintext := []byte("sample text. this text is test text.")
 	key, _ := hex.DecodeString("000102030405060708090A0B0C0E0F101112131415161718191A1B1C1E1F2021")
-	ct, err := Enc(plaintext, key, nonce)
+	ct, err := enc(plaintext, key, nonce)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -180,7 +180,7 @@ func Test_encWitchCounter(t *testing.T) {
 	key, _ := hex.DecodeString("000102030405060708090A0B0C0E0F101112131415161718191A1B1C1E1F2021")
 	cc := genCounter(nonce)
 	incrementCounter(cc)
-	ct, err := EncWitchCounter(plaintext, key, nonce, cc)
+	ct, err := encWitchCounter(plaintext, key, nonce, cc)
 	if err != nil {
 		panic(err.Error())
 	}

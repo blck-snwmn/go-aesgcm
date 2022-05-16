@@ -33,11 +33,11 @@ func xors(l, r []byte) []byte {
 	return ll
 }
 
-func Enc(plaintext, key, nonce []byte) ([]byte, error) {
-	return EncWitchCounter(plaintext, key, nonce, genCounter(nonce))
+func enc(plaintext, key, nonce []byte) ([]byte, error) {
+	return encWitchCounter(plaintext, key, nonce, genCounter(nonce))
 }
 
-func EncWitchCounter(plaintext, key, nonce []byte, c [16]byte) ([]byte, error) {
+func encWitchCounter(plaintext, key, nonce []byte, c [16]byte) ([]byte, error) {
 	blockNum, r := len(plaintext)/size, len(plaintext)%size
 	if r != 0 {
 		blockNum++
@@ -142,7 +142,7 @@ func ghash(cipherText, additionalData, hk []byte) [16]byte {
 
 func Seal(plaintext, key, nonce, additionalData []byte) ([]byte, error) {
 	counter := incrementCounter(genCounter(nonce))
-	ct, err := EncWitchCounter(plaintext, key, nonce, counter)
+	ct, err := encWitchCounter(plaintext, key, nonce, counter)
 	if err != nil {
 		return nil, err
 	}
