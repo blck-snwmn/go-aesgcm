@@ -89,7 +89,7 @@ func Test_incrementCounter(t *testing.T) {
 
 	t.Run("last 4 bytes is 100 when increment 100 times", func(t *testing.T) {
 		c := genCounter(nonce)
-		for i := 0; i < 1000; i++ {
+		for range 1000 {
 			c = incrementCounter(c)
 		}
 		want := [16]byte{
